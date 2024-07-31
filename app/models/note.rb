@@ -34,7 +34,7 @@ class Note < ApplicationRecord
   end
 
   def validate_content_word_count
-    return if utility.nil? || content.blank?
+    return if utility.nil? || content.nil?
 
     return unless note_type == 'review' && content_length != 'short'
 
