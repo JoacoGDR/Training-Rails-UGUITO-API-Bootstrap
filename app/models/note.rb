@@ -22,7 +22,6 @@ class Note < ApplicationRecord
   end
 
   def content_length
-    return if utility.nil?
     classify_content.to_s
   end
 
