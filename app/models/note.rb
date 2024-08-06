@@ -17,6 +17,9 @@ class Note < ApplicationRecord
   validates :user_id, :title, :content, :note_type, presence: true
   validate :validate_content_word_count, if: -> { utility.present? && content.present? }
 
+  scope :with_note_type, ->(note_type) { where(note_type: note_type) }
+  scope :with_pagination, ->(page, page_size) { page(page).per(page_size) }
+
   def word_count
     content.split.size
   end
@@ -32,6 +35,6 @@ class Note < ApplicationRecord
   def validate_content_word_count
     return unless note_type == 'review' && content_length != 'short'
 
-    errors.add(:content, I18n.t('content_length_error'))
+    errors.add(:content, I18n.t('errors.messages.note.invalid_content_length'))
   end
 end
