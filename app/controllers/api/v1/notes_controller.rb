@@ -1,6 +1,8 @@
 module Api
   module V1
     class NotesController < ApplicationController
+      before_action :authenticate_user!
+
       def index
         return render_invalid_note_type if invalid_note_type?
         return render_invalid_order if invalid_order?
@@ -15,7 +17,7 @@ module Api
       private
 
       def note
-        Note.find(params.require(:id))
+        current_user.notes.find(params.require(:id))
       end
 
       def invalid_order?
@@ -27,8 +29,8 @@ module Api
       end
 
       def notes
-        Note.with_note_type(params[:note_type]).order(created_at: params[:order])
-            .with_pagination(params.require(:page), params.require(:page_size))
+        current_user.notes.with_note_type(params[:note_type]).order(created_at: params[:order])
+                    .with_pagination(params.require(:page), params.require(:page_size))
       end
 
       def render_invalid_parameter_error(message)
