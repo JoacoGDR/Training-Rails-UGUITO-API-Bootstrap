@@ -27,7 +27,6 @@ module Api
       def invalid_note_type?
         Note.note_types.keys.exclude?(params.require(:note_type))
       end
-      
 
       def notes
         current_user.notes.with_note_type(params[:note_type]).order(created_at: params[:order])
