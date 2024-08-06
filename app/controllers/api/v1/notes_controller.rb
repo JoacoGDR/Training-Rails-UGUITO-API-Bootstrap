@@ -5,7 +5,7 @@ module Api
         return render_invalid_note_type if invalid_note_type?
         return render_invalid_order if invalid_order?
 
-        render json: notes_filtered, status: :ok, each_serializer: BriefNoteSerializer
+        render json: notes, status: :ok, each_serializer: BriefNoteSerializer
       end
 
       def show
@@ -26,7 +26,7 @@ module Api
         Note.note_types.keys.exclude?(params.require(:note_type))
       end
 
-      def notes_filtered
+      def notes
         Note.with_note_type(params[:note_type]).order(created_at: params[:order])
             .with_pagination(params.require(:page), params.require(:page_size))
       end
