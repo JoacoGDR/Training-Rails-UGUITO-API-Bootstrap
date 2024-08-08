@@ -12,10 +12,6 @@ describe RetrieveBooksWorker do
     let(:params) { { author: author } }
     let(:user) { create(:user, utility: utility) }
 
-    let(:expected_books_keys) do
-      %i[id title author genre image_url publisher year]
-    end
-
     context 'with utility service' do
       let_it_be(:utilities) do
         %i[north_utility south_utility]
@@ -26,17 +22,13 @@ describe RetrieveBooksWorker do
       end
 
       context 'when the request to the utility succeeds' do
-        it 'succeeds' do
-          expect(execute_worker.first).to eq 200
+        let(:response_status) { execute_worker.first }
+        let(:response_array) { execute_worker.second[:books] }
+        let(:expected_keys) do
+          %i[id title author genre image_url publisher year]
         end
 
-        it 'returns books as array' do
-          expect(execute_worker.second[:books]).to be_instance_of(Array)
-        end
-
-        it 'returns the expected book keys' do
-          expect(execute_worker.second[:books].first.keys).to contain_exactly(*expected_books_keys)
-        end
+        it_behaves_like 'valid array response with at least one resource'
       end
 
       context 'when the request to the utility fails' do
