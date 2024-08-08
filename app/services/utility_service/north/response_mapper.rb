@@ -25,10 +25,6 @@ module UtilityService
         end
       end
 
-      def map_note_type(note_type)
-        note_type == 'critica' ? 'critique' : 'review'
-      end
-
       def map_notes(notes)
         notes.map do |note|
           {
@@ -40,6 +36,10 @@ module UtilityService
             book: map_note_book(note)
           }
         end
+      end
+
+      def map_note_type(note_type)
+        note_type == 'critica' ? 'critique' : 'review'
       end
 
       def map_note_user(note)
