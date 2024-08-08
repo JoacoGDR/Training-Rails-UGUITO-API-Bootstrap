@@ -32,18 +32,26 @@ module UtilityService
             type: note['ReseniaNota'] ? 'review' : 'critique',
             created_at: note['FechaCreacionNota'],
             content: note['Contenido'],
-            user: {
-              email: note['EmailAutor'],
-              first_name: note['NombreCompletoAutor'].split.first,
-              last_name: note['NombreCompletoAutor'].split.join(' ')[1..]
-            },
-            book: {
-              title: note['TituloLibro'],
-              author: note['NombreAutorLibro'],
-              genre: note['GeneroLibro']
-            }
+            user: map_note_user(note, note['NombreAutorNota'].split),
+            book: map_note_book(note)
           }
         end
+      end
+
+      def map_note_user(note, full_name)
+        {
+          email: note['EmailAutor'],
+          first_name: full_name.first,
+          last_name: full_name[1..].join(' ')
+        }
+      end
+
+      def map_note_book(note)
+        {
+          title: note['TituloLibro'],
+          author: note['NombreAutorLibro'],
+          genre: note['GeneroLibro']
+        }
       end
     end
   end
