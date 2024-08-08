@@ -47,7 +47,11 @@ describe Api::V1::NotesController, type: :controller do
 
         before { get :index, params: valid_required_params.except(missing_param) }
 
-        it_behaves_like 'missing parameter bad request'
+        it_behaves_like 'bad request'
+
+        it 'responds with the correct missing parameter error message' do
+          expect(response_body['error']).to eq(I18n.t('errors.messages.note.missing_param'))
+        end
       end
 
       context 'when fetching notes with an invalid note type' do
@@ -107,6 +111,63 @@ describe Api::V1::NotesController, type: :controller do
     context 'when there is not a user logged in' do
       context 'when fetching a note' do
         before { get :show, params: { id: Faker::Number.number } }
+
+        it_behaves_like 'unauthorized'
+      end
+    end
+  end
+
+  describe 'POST #create' do
+    context 'when there is a user logged in' do
+      include_context 'with authenticated user'
+      let(:note_params) { attributes_for(:note) }
+
+      context 'when creating a valid note' do
+        let(:created_resource) { Note.where(note_params) }
+
+        before { post :create, params: { note: note_params } }
+
+        it_behaves_like 'successful create response'
+
+        it 'responds the custom success message' do
+          expect(response_body['message']).to eq(I18n.t('success.messages.note.create_success'))
+        end
+      end
+
+      context 'when attempting to create a note with missing parameter' do
+        let(:missing_param) { note_params.keys.sample }
+        let(:message) { I18n.t('errors.messages.note.missing_param') }
+
+        before { post :create, params: { note: note_params.except(missing_param) } }
+
+        it_behaves_like 'bad request with message'
+      end
+
+      context 'when creating a note with an invalid note type' do
+        let(:note_params) { attributes_for(:note).merge(note_type: :invalid_type) }
+        let(:message) { I18n.t('errors.messages.note.invalid_note_type') }
+
+        before { post :create, params: { note: note_params } }
+
+        it_behaves_like 'unprocessable entity with message'
+      end
+
+      context 'when creating a note with type review and invalid content length' do
+        let(:word_count) { Faker::Number.between(from: user.utility.short_threshold + 1) }
+        let(:review_params) do
+          note_params.merge(note_type: :review, content: Faker::Lorem.sentence(word_count: word_count), user_id: user.id)
+        end
+        let(:message) { I18n.t('errors.messages.note.invalid_content_length', threshold: user.utility.short_threshold) }
+
+        before { post :create, params: { note: review_params } }
+
+        it_behaves_like 'unprocessable entity with message'
+      end
+    end
+
+    context 'when there is not a user logged in' do
+      context 'when creating a note' do
+        before { post :create, params: { note: attributes_for(:note) } }
 
         it_behaves_like 'unauthorized'
       end
