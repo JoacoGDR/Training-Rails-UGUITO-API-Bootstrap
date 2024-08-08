@@ -56,7 +56,7 @@ ActiveAdmin.register Book do
       f.input :title
       f.input :publisher
       f.input :year
-      f.actions
     end
+    f.actions
   end
 end
