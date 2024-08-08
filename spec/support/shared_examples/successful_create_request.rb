@@ -1,6 +1,5 @@
 shared_examples 'successful create response' do
-  it 'creates the resource and persists it to the database without duplicates' do
-    expect(created_resource).to be_present
+  it 'creates the resource' do
     expect(created_resource.count).to eq(1)
   end
 

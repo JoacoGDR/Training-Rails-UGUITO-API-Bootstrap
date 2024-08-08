@@ -136,26 +136,20 @@ describe Api::V1::NotesController, type: :controller do
 
       context 'when attempting to create a note with missing parameter' do
         let(:missing_param) { note_params.keys.sample }
+        let(:message) { I18n.t('errors.messages.note.missing_param') }
 
         before { post :create, params: { note: note_params.except(missing_param) } }
 
-        it 'responds with the correct custom missing parameter error message' do
-          expect(response_body['error']).to eq(I18n.t('errors.messages.note.missing_param'))
-        end
-
-        it_behaves_like 'bad request'
+        it_behaves_like 'bad request with message'
       end
 
       context 'when creating a note with an invalid note type' do
         let(:note_params) { attributes_for(:note).merge(note_type: :invalid_type) }
+        let(:message) { I18n.t('errors.messages.note.invalid_note_type') }
 
         before { post :create, params: { note: note_params } }
 
-        it_behaves_like 'unprocessable entity response'
-
-        it 'responds with the correct invalid note type error message' do
-          expect(response_body['error']).to eq(I18n.t('errors.messages.note.invalid_note_type'))
-        end
+        it_behaves_like 'unprocessable entity with message'
       end
 
       context 'when creating a note with type review and invalid content length' do
@@ -163,14 +157,11 @@ describe Api::V1::NotesController, type: :controller do
         let(:review_params) do
           note_params.merge(note_type: :review, content: Faker::Lorem.sentence(word_count: word_count), user_id: user.id)
         end
+        let(:message) { I18n.t('errors.messages.note.invalid_content_length', threshold: user.utility.short_threshold) }
 
         before { post :create, params: { note: review_params } }
 
-        it_behaves_like 'unprocessable entity response'
-
-        it 'responds with the correct invalid content length error message' do
-          expect(response_body['error']).to eq(I18n.t('errors.messages.note.invalid_content_length', threshold: user.utility.short_threshold))
-        end
+        it_behaves_like 'unprocessable entity with message'
       end
     end
 
