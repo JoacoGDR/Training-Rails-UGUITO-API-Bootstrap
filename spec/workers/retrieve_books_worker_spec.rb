@@ -22,8 +22,7 @@ describe RetrieveBooksWorker do
       end
 
       context 'when the request to the utility succeeds' do
-        let(:response_status) { execute_worker.first }
-        let(:response_array) { execute_worker.second[:books] }
+        let(:root_key) { :books }
         let(:expected_keys) do
           %i[id title author genre image_url publisher year]
         end
