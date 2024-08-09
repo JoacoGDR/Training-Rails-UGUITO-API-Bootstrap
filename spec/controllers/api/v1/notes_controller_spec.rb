@@ -139,13 +139,11 @@ describe Api::V1::NotesController, type: :controller do
 
         before { post :create, params: { note: note_params.except(missing_param) } }
 
-        it 'responds with the correct missing parameter error message' do
+        it 'responds with the correct custom missing parameter error message' do
           expect(response_body['error']).to eq(I18n.t('errors.messages.note.missing_param'))
         end
 
-        it 'responds error status' do
-          expect(response).to have_http_status(:bad_request)
-        end
+        it_behaves_like 'bad request'
       end
 
       context 'when creating a note with an invalid note type' do
@@ -163,9 +161,7 @@ describe Api::V1::NotesController, type: :controller do
       context 'when creating a note with type review and invalid content length' do
         let(:word_count) { Faker::Number.between(from: user.utility.short_threshold + 1) }
         let(:review_params) do
-          note_params.merge(note_type: :review)
-                     .merge(content: Faker::Lorem.sentence(word_count: word_count))
-                     .merge(user_id: user.id)
+          note_params.merge(note_type: :review, content: Faker::Lorem.sentence(word_count: word_count), user_id: user.id)
         end
 
         before { post :create, params: { note: review_params } }
@@ -184,6 +180,27 @@ describe Api::V1::NotesController, type: :controller do
 
         it_behaves_like 'unauthorized'
       end
+    end
+  end
+
+  describe 'GET #index_async' do
+    context 'when the user is authenticated' do
+      include_context 'with authenticated user'
+
+      let(:author) { Faker::Book.author }
+      let(:params) { { author: author } }
+      let(:worker_name) { 'RetrieveNotesWorker' }
+      let(:parameters) { [user.id, params] }
+
+      before { get :index_async, params: params }
+
+      it_behaves_like 'basic endpoint with polling'
+    end
+
+    context 'when the user is not authenticated' do
+      before { get :index_async }
+
+      it_behaves_like 'unauthorized'
     end
   end
 end
