@@ -39,7 +39,7 @@ module UtilityService
       end
 
       def map_note_user(note)
-        full_name = note['NombreAutor'].split(' ')
+        full_name = note['NombreCompletoAutor'].split(' ')
         {
           email: note['EmailAutor'],
           first_name: full_name.first,
