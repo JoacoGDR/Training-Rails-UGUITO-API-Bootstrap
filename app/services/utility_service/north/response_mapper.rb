@@ -29,7 +29,7 @@ module UtilityService
         notes.map do |note|
           {
             title: note['titulo'],
-            type: map_note_type(note['tipo']),
+            type: map_note_type[note['tipo']],
             created_at: note['fecha_creacion'],
             content: note['contenido'],
             user: map_note_user(note),
@@ -38,8 +38,8 @@ module UtilityService
         end
       end
 
-      def map_note_type(note_type)
-        note_type == 'critica' ? 'critique' : 'review'
+      def map_note_type
+        { 'opinion' => 'review', 'resenia' => 'review', 'critica' => 'critique' }
       end
 
       def map_note_user(note)

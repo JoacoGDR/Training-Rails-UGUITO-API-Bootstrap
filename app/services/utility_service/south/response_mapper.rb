@@ -32,13 +32,14 @@ module UtilityService
             type: note['ReseniaNota'] ? 'review' : 'critique',
             created_at: note['FechaCreacionNota'],
             content: note['Contenido'],
-            user: map_note_user(note, note['NombreAutorNota'].split),
+            user: map_note_user(note),
             book: map_note_book(note)
           }
         end
       end
 
-      def map_note_user(note, full_name)
+      def map_note_user(note)
+        full_name = note['NombreAutor'].split(' ')
         {
           email: note['EmailAutor'],
           first_name: full_name.first,

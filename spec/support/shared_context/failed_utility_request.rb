@@ -1,4 +1,4 @@
-shared_context 'without utility service' do
+shared_context 'with failed utility request' do
   subject(:execute_worker) do
     described_class.new.execute(user.id, params)
   end

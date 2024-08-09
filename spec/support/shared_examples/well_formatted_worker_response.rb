@@ -1,4 +1,4 @@
-shared_examples 'worker response with valid format and expected code' do
+shared_examples 'well formatted worker response' do
   it 'returns status code obtained from the utility service' do
     expect(execute_worker.first).to eq(expected_status_code)
   end

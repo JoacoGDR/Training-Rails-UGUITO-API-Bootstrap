@@ -28,7 +28,7 @@ describe RetrieveBooksWorker do
           %i[id title author genre image_url publisher year]
         end
 
-        it_behaves_like 'valid array response with at least one resource'
+        it_behaves_like 'valid worker array response'
       end
 
       context 'when the request to the utility fails' do

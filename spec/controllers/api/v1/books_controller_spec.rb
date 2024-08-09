@@ -118,7 +118,7 @@ describe Api::V1::BooksController, type: :controller do
 
       before { get :index_async, params: params }
 
-      it_behaves_like 'successfully enqueued job worker response'
+      it_behaves_like 'basic endpoint with polling'
     end
 
     context 'when the user is not authenticated' do
