@@ -21,7 +21,7 @@ class Utility < ApplicationRecord
   include EntityWithCode
   include AttributeJsonParser
 
-  JSON_ATTRIBUTES = %i[integration_urls].freeze
+  JSON_ATTRIBUTES = %i[integration_urls content_length_thresholds].freeze
 
   has_many :users, dependent: :destroy
 
@@ -32,6 +32,7 @@ class Utility < ApplicationRecord
                  :external_api_authentication_url,
                  :books_data_url,
                  :notes_data_url
+  store_accessor :content_length_thresholds, :short_threshold, :medium_threshold
 
   def generate_entity_code
     return if code.present? && !code.to_i.zero?
