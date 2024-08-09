@@ -1,14 +1,14 @@
 require 'rails_helper'
 
-describe RetrieveBooksWorker do
+describe RetrieveNotesWorker do
   describe '#execute' do
     subject(:execute_worker) do
-      VCR.use_cassette "retrieve_books/#{utility_name}/valid_params" do
+      VCR.use_cassette "retrieve_notes/#{utility_name}/valid_params" do
         described_class.new.execute(user.id, params)
       end
     end
 
-    let(:author) { 'Rodrigo Lugo Melgar' }
+    let(:author) { 'J.K. Rowling' }
     let(:params) { { author: author } }
     let(:user) { create(:user, utility: utility) }
 
@@ -23,9 +23,9 @@ describe RetrieveBooksWorker do
 
       context 'when the request to the utility succeeds' do
         let(:response_status) { execute_worker.first }
-        let(:response_array) { execute_worker.second[:books] }
+        let(:response_array) { execute_worker.second[:notes] }
         let(:expected_keys) do
-          %i[id title author genre image_url publisher year]
+          %i[title type created_at content user book]
         end
 
         it_behaves_like 'valid worker array response'
@@ -38,7 +38,7 @@ describe RetrieveBooksWorker do
 
         let(:expected_status_code) { 500 }
         let(:expected_response_body) { { error: 'message' } }
-        let(:utility_service_method) { :retrieve_books }
+        let(:utility_service_method) { :retrieve_notes }
 
         before do
           allow(utility_service_class).to receive(:new).and_return(utility_service_instance)
@@ -48,13 +48,7 @@ describe RetrieveBooksWorker do
           allow(utility_service_instance).to receive(:utility).and_return(utility)
         end
 
-        it 'returns status code obtained from the utility service' do
-          expect(execute_worker.first).to eq(expected_status_code)
-        end
-
-        it 'returns the body obtained from the utility service' do
-          expect(execute_worker.second).to eq(expected_response_body)
-        end
+        it_behaves_like 'well formatted worker response'
       end
     end
   end

@@ -9,17 +9,11 @@ ActiveAdmin.register Book do
   filter :publisher
   filter :year
 
-  permit_params = %i[utility_id user_id genre author image title publisher year]
+  permit_params %i[utility_id user_id genre author image title publisher year]
 
   member_action :copy, method: :get do
     @book = resource.dup
     render :new, layout: false
-  end
-
-  controller do
-    define_method :permitted_params do
-      params.permit(active_admin_namespace.permitted_params, book: permit_params)
-    end
   end
 
   index do
