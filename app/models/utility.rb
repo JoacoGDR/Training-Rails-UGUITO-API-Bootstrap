@@ -32,6 +32,8 @@ class Utility < ApplicationRecord
                  :notes_data_url
   store_accessor :content_length_thresholds, :short_threshold, :medium_threshold
 
+  before_save :cast_thresholds_to_numeric
+
   def generate_entity_code
     return if code.present? && !code.to_i.zero?
     self.code = id
@@ -80,5 +82,11 @@ class Utility < ApplicationRecord
 
   def utility_type
     type.chomp('Utility')
+  end
+
+  def cast_thresholds_to_numeric
+    content_length_thresholds.each do |key, value|
+      content_length_thresholds[key] = value.to_i
+    end
   end
 end
