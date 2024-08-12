@@ -15,7 +15,6 @@
 #  jsonb                                :jsonb
 #  created_at                           :datetime         not null
 #  updated_at                           :datetime         not null
-#  content_length_thresholds            :jsonb
 #
 class Utility < ApplicationRecord
   include EntityWithCode
