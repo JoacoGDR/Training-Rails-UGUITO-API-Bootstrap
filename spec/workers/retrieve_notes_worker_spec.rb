@@ -1,14 +1,14 @@
 require 'rails_helper'
 
-describe RetrieveBooksWorker do
+describe RetrieveNotesWorker do
   describe '#execute' do
     subject(:execute_worker) do
-      VCR.use_cassette "retrieve_books/#{utility_name}/valid_params" do
+      VCR.use_cassette "retrieve_notes/#{utility_name}/valid_params" do
         described_class.new.execute(user.id, params)
       end
     end
 
-    let(:author) { 'Rodrigo Lugo Melgar' }
+    let(:author) { 'J.K. Rowling' }
     let(:params) { { author: author } }
     let(:user) { create(:user, utility: utility) }
 
@@ -22,12 +22,26 @@ describe RetrieveBooksWorker do
       end
 
       context 'when the request to the utility succeeds' do
-        let(:root_key) { :books }
+        let(:root_key) { :notes }
         let(:expected_keys) do
-          %i[id title author genre image_url publisher year]
+          %i[title type created_at content user book]
+        end
+        let(:user_keys) do
+          %i[email first_name last_name]
+        end
+        let(:book_keys) do
+          %i[title author genre]
         end
 
         it_behaves_like 'valid worker array response'
+
+        it('returns the expected user keys') do
+          expect(execute_worker.second[root_key].first[:user].keys).to contain_exactly(*user_keys)
+        end
+
+        it('returns the expected book keys') do
+          expect(execute_worker.second[root_key].first[:book].keys).to contain_exactly(*book_keys)
+        end
       end
 
       context 'when the request to the utility fails' do
@@ -37,7 +51,7 @@ describe RetrieveBooksWorker do
 
         let(:expected_status_code) { 500 }
         let(:expected_response_body) { { error: 'message' } }
-        let(:utility_service_method) { :retrieve_books }
+        let(:utility_service_method) { :retrieve_notes }
 
         before do
           allow(utility_service_class).to receive(:new).and_return(utility_service_instance)
@@ -47,13 +61,7 @@ describe RetrieveBooksWorker do
           allow(utility_service_instance).to receive(:utility).and_return(utility)
         end
 
-        it 'returns status code obtained from the utility service' do
-          expect(execute_worker.first).to eq(expected_status_code)
-        end
-
-        it 'returns the body obtained from the utility service' do
-          expect(execute_worker.second).to eq(expected_response_body)
-        end
+        it_behaves_like 'successful worker response'
       end
     end
   end
