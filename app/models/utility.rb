@@ -85,8 +85,6 @@ class Utility < ApplicationRecord
   end
 
   def cast_thresholds_to_numeric
-    content_length_thresholds.each do |key, value|
-      content_length_thresholds[key] = value.to_i
-    end
+    content_length_thresholds.transform_values!(&:to_i)
   end
 end
