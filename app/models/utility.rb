@@ -15,12 +15,13 @@
 #  jsonb                                :jsonb
 #  created_at                           :datetime         not null
 #  updated_at                           :datetime         not null
+#  content_length_thresholds            :jsonb
 #
 class Utility < ApplicationRecord
   include EntityWithCode
   include AttributeJsonParser
 
-  JSON_ATTRIBUTES = %i[integration_urls].freeze
+  JSON_ATTRIBUTES = %i[integration_urls content_length_thresholds].freeze
 
   has_many :users, dependent: :destroy
 
@@ -29,6 +30,9 @@ class Utility < ApplicationRecord
 
   store_accessor :integration_urls, :external_api_authentication_url, :books_data_url,
                  :notes_data_url
+  store_accessor :content_length_thresholds, :short_threshold, :medium_threshold
+
+  before_save :cast_thresholds_to_numeric
 
   def generate_entity_code
     return if code.present? && !code.to_i.zero?
@@ -78,5 +82,9 @@ class Utility < ApplicationRecord
 
   def utility_type
     type.chomp('Utility')
+  end
+
+  def cast_thresholds_to_numeric
+    content_length_thresholds.transform_values!(&:to_i)
   end
 end
